@@ -3,6 +3,26 @@
 import { useState, useEffect } from 'react'
 import Arrow from './assets/Arrow'
 
+import { useState } from 'react';
+
+const tg = window.Telegram.WebApp;
+const userId = tg?.initDataUnsafe?.user?.id || 'anonymous';
+const referralLink = `https://t.me/SovereignArcadeBot?start=ref_${userId}`;
+
+const [copied, setCopied] = useState(false);
+
+const copyReferralLink = () => {
+  navigator.clipboard.writeText(referralLink);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 2000);
+};
+const [copied, setCopied] = useState(false);
+const copyLink = () => {
+  navigator.clipboard.writeText(referralLink);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 2000);
+};
+
 function App() {
   const [isPressed, setIsPressed] = useState(false);
   const [points, setPoints] = useState(0);
@@ -131,6 +151,19 @@ function App() {
               }}
               className='select-none'
             />
+
+            <div className="mt-6 text-center">
+  <p className="text-white text-sm">Invite frens to unlock boosts 🌟</p>
+  <button
+    onClick={copyReferralLink}
+    className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-2 px-4 rounded-full mt-2"
+  >
+    📎 Copy Invite Link
+  </button>
+  {copied && (
+    <p className="text-green-400 mt-2 font-semibold">Copied!</p>
+  )}
+</div>
             {clicks.map((click) => (
               <div
                 key={click.id}
