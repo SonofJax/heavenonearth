@@ -16,7 +16,7 @@ function App() {
   const handleMouseUp = () => setIsPressed(false);
 
   const openGithub = () => {
-    window.open('https://github.com/Malith-Rukshan/NotCoin-Mini-App-Clone');
+    window.open('https://heavenonearth-16u7md8cc-sonofjaxs-projects.vercel.app');
   };
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -39,8 +39,8 @@ function App() {
   // useEffect hook to restore energy over time
   useEffect(() => {
     const interval = setInterval(() => {
-      setEnergy((prevEnergy) => Math.min(prevEnergy + 1, 6500));
-    }, 200); // Resporce energy every 200ms
+      setEnergy((prevEnergy) => Math.min(prevEnergy + 1, 300));
+    }, 200); // Resporce energy every 500ms
 
     return () => clearInterval(interval); // Clear interval on component unmount
   }, []);
@@ -69,7 +69,7 @@ function App() {
           </div>
           <div className="text-base mt-2 flex items-center">
             <img src='./images/trophy.png' width={24} height={24} />
-            <a href="https://github.com/Malith-Rukshan" target="_blank" rel="noopener noreferrer">
+            <a href="CureClicker" target="_blank" rel="noopener noreferrer">
               <span className="ml-1">Gold <Arrow size={18} className="ml-0 mb-1 inline-block" /></span>
             </a>
           </div>
