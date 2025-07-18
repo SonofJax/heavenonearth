@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Arrow from './assets/Arrow'
 
 import { useState } from 'react';
+// app.tsx
+import { useEffect } from 'react';
 
 const tg = window.Telegram.WebApp;
 const userId = tg?.initDataUnsafe?.user?.id || 'anonymous';
@@ -24,6 +26,29 @@ const copyLink = () => {
 };
 
 function App() {
+
+const App = () => {
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg) return;
+
+    tg.ready();
+
+    const user = tg.initDataUnsafe?.user;
+    const referral = tg.initDataUnsafe?.start_param || null;
+
+    if (!user) return;
+
+    // 🚀 Send to your referral bot backend
+    fetch("https://children-of-god-referral-bot.onrender.com"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        telegramId: user.id,
+        username: user.username,
+        referral,
+      })
+        
   const [isPressed, setIsPressed] = useState(false);
   const [points, setPoints] = useState(0);
   const [energy, setEnergy] = useState(150);
@@ -110,6 +135,17 @@ function App() {
             <div className="flex-grow flex items-center max-w-60 text-sm">
               <div className="w-full bg-[#fad258] py-4 rounded-2xl flex justify-around">
                 <button className="flex flex-col items-center gap-1" onClick={openGithub}>
+               onClick={() => {
+    const tg = (window as any).Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user;
+
+    if (tg && user?.username) {
+      const link = `https://t.me/SovereignArcadeBot?start=${user.username}`;
+      tg.openTelegramLink(link);
+    } else {
+      alert("Telegram user info missing");
+    }
+  }}
                   <img src='./images/bear.png' width={24} height={24} alt="High Voltage"/>
                   <span>Frens</span>
                 </button>
