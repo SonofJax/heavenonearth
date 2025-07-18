@@ -6,7 +6,37 @@ import Arrow from './assets/Arrow'
 import { useState } from 'react';
 // app.tsx
 import { useEffect } from 'react';
+app.post("/api/save-progress", async (req, res) => {
+  const { user_id, progress } = req.body;
+  const game = "cureClicker";
 
+  if (!user_id || !progress) {
+    return res.status(400).json({ error: "Missing user_id or progress" });
+  }
+
+  const { data: existing, error: fetchError } = await supabase
+    .from("user_stats")
+    .select("games")
+    .eq("user_id", user_id)
+    .single();
+
+  if (fetchError && fetchError.code !== "PGRST116") {
+    return res.status(500).json({ error: "Fetch failed" });
+  }
+
+  const updatedGames = {
+    ...(existing?.games || {}),
+    [game]: progress
+  };
+
+  const { error: upsertError } = await supabase
+    .from("user_stats")
+    .upsert({ user_id, games: updatedGames }, { onConflict: ["user_id"] });
+
+  if (upsertError) return res.status(500).json({ error: "Save failed" });
+
+  res.json({ status: "ok" });
+});
 const tg = window.Telegram.WebApp;
 const userId = tg?.initDataUnsafe?.user?.id || 'anonymous';
 const referralLink = `https://t.me/SovereignArcadeBot?start=ref_${userId}`;
