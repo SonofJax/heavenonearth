@@ -1,5 +1,12 @@
 // © 2024 Malith Rukshan - https://github.com/Malith-Rukshan
 
+const saveBuffer: {
+  clicks?: number;
+  energy?: number;
+  coins?: number;
+  purchases?: any;
+} = {};
+
 import { useState, useEffect } from 'react'
 import Arrow from './assets/Arrow'
 
@@ -37,6 +44,24 @@ app.post("/api/save-progress", async (req, res) => {
 
   res.json({ status: "ok" });
 });
+app.get("/api/get-progress", async (req, res) => {
+  const { user_id } = req.query;
+  const game = "cureClicker";
+
+  if (!user_id) return res.status(400).send("Missing user_id");
+
+  const { data, error } = await supabase
+    .from("user_stats")
+    .select("games")
+    .eq("user_id", user_id)
+    .single();
+
+  if (error) return res.status(500).send("Failed to fetch");
+
+  res.json(data?.games?.[game] || {});
+});
+
+
 const tg = window.Telegram.WebApp;
 const userId = tg?.initDataUnsafe?.user?.id || 'anonymous';
 const referralLink = `https://t.me/SovereignArcadeBot?start=ref_${userId}`;
@@ -110,6 +135,42 @@ const App = () => {
   const handleAnimationEnd = (id: number) => {
     setClicks((prevClicks) => prevClicks.filter(click => click.id !== id));
   };
+
+    useEffect(() => {
+  const tg = (window as any).Telegram.WebApp;
+  tg.ready();
+
+  const userId = tg?.initDataUnsafe?.user?.id;
+  if (!userId) return;
+
+  // Load saved data
+  fetch(`https://<YOUR-RENDER-URL>/api/get-progress?user_id=${userId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      setClicks(data.clicks || 0);
+      setEnergy(data.energy || 100);
+      setCoins(data.coins || 0);
+      setPurchases(data.purchases || []);
+    });
+
+  // Save buffered data every 3 seconds (like Notcoin)
+  const interval = setInterval(() => {
+    if (!Object.keys(saveBuffer).length) return;
+
+    fetch("https://<YOUR-RENDER-URL>/api/save-progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: userId,
+        progress: { ...saveBuffer },
+      }),
+    });
+
+    for (const key in saveBuffer) delete saveBuffer[key];
+  }, 3000);
+
+  return () => clearInterval(interval);
+}, []);
 
   // useEffect hook to restore energy over time
   useEffect(() => {
